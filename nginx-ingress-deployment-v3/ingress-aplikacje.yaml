@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: app-ingress
+  namespace: aplikacja
+spec:
+  rules:
+  - host: app.dominik.com
+    http:
+      paths:
+      - backend:
+          serviceName: serwis-aplikacji1
+          servicePort: 80
+        path: /app1
+      - backend:
+          serviceName: serwis-aplikacji2
+          servicePort: 80
+        path: /app2
