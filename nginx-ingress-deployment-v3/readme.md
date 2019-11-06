@@ -23,7 +23,7 @@ Jako load balancer wykorzystamy nginx z defaultowym back-endem. Wszystko z zewn�
 - Namespace dla aplikacji: aplikacja
 - Namespace dla nginx i obiektu ingress: ingress
 
-1. Najpierw tworzymy przykładowe dwie aplikacje z dwiema replikami każda (hello-app) z dockersamples/static-site.
+1. Najpierw tworzymy przykładowe dwie aplikacje z dwiema replikami każda (hello-app i zwykly Apache) z dockersamples/static-site i ..httpd.
 
 -> plik: app-deployment.yaml
 
