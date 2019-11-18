@@ -23,4 +23,17 @@ spec:
     targetPort: 80
   selector:
     app: app2
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serwis-wordpress
+  namespace: aplikacja
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: wordpress
+  

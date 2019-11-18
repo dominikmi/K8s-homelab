@@ -18,3 +18,11 @@ spec:
           serviceName: serwis-aplikacji2
           servicePort: 80
         path: /app2
+      - backend:
+          serviceName: serwis-wordpress
+          servicePort: 80
+        path: /wordpress
+#      - backend:
+#          serviceName: serwis-wordpress
+#          servicePort: 80
+#        path: /wp-admin/install.php

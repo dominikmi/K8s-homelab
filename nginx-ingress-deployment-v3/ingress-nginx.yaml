@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: nginx-ingress
   namespace: ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
 spec:
   rules:
   - host: app.dominik.com
