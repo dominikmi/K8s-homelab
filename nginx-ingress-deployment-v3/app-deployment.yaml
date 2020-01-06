@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: app1
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -21,6 +21,12 @@ spec:
           value: app1
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 300m
+          requests:
+            cpu: 100m
+            memory: 250Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,7 +37,7 @@ spec:
   selector:
     matchLabels:
       app: app2
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -51,12 +57,19 @@ kind: Deployment
 metadata:
   name: wordpress
   namespace: aplikacja
+  annotations:
+    kubernetes.io/change-cause: "Image change"
 spec:
   selector:
     matchLabels:
       app: wordpress
+#  strategy:
+#    type: Recreate
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -67,7 +80,7 @@ spec:
         image: wordpress:4.8-apache 
         env:
         - name: WORDPRESS_DB_HOST 
-          value: 10.38.0.12
+          value: 10.40.0.23
         - name: WORDPRESS_DB_PASSWORD
           value: kukulka
         ports:
@@ -94,7 +107,7 @@ spec:
       app: wordpress
       tier: mysql
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:

@@ -1,0 +1,9 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+#  namespace: aplikacja
+  name: clusterviewer
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["pods","nodes","namespaces"]
+  verbs: ["get", "list", "watch"]

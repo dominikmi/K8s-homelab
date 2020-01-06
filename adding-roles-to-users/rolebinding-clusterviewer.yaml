@@ -1,0 +1,13 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: clusterviewer-binding
+#  namespace: aplikacja
+subjects:
+- kind: User
+  name: clusterviewer
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: clusterviewer
+  apiGroup: ""
