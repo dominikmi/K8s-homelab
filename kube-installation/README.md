@@ -81,8 +81,17 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 Install CNI network pod on kmaster to the whole cluster:
  `$ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"`
 
-Then you can join any number of worker nodes by running the following on each as root:
+Then you can join any number of worker nodes by running the following on each as root (any previous setup needs to be erased with `kubeadm reset` prior to issuing the join command:
 
 `$sudo kubeadm join 192.168.122.100:6443 --token tv7jsa.z2jhbyy6hl4uudo1 \
     --discovery-token-ca-cert-hash <the hash from the printout after successful kube deployment on master>`
 
+If everything went well, you should be getting the following output:
+```
+$ kubectl get nodes -o wide
+NAME       STATUS   ROLES    AGE     VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+kmaster    Ready    master   7m31s   v1.17.0   192.168.122.100   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
+kworker1   Ready    <none>   57s     v1.17.0   192.168.122.101   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
+kworker2   Ready    <none>   18s     v1.17.0   192.168.122.102   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
+kworker3   Ready    <none>   102s    v1.17.0   192.168.122.103   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
+```
