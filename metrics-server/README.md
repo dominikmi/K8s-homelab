@@ -18,6 +18,7 @@ $ kubectl create -f deploy/1.8+/
 
 You can also use this helm chart to deploy the metric-server in your cluster (This isn't supported by the metrics-server maintainers): https://github.com/helm/charts/tree/master/stable/metrics-server
 
+```console
 # deploy the latest metric-server
 $ kubectl create -f deploy/1.8+/
 clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
@@ -36,7 +37,6 @@ clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
 # - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
 $ kubectl edit deploy -n kube-system metrics-server
 ```
-![minikube-metric-server-args](deploy/minikube/metric-server-args.png)
 
 ## Flags
 
