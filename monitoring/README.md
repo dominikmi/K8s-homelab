@@ -9,5 +9,5 @@
 	- grafana-values.yaml
 7) apply the configmap for Grafana: `kubectl apply -f grafana-configmap.yaml`
 8) Install Grafana `helm install grafana stable/grafana -f grafana-values.yaml --namespace monitoring`
-9) Extract default password for grafana admin user: `kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
-9) Get to http://<uour_grafana_ui_IP>:3000 and log in with `admin` and `password`
+9) Extract default password for grafana admin user: `kubectl get secret --namespace monitoring grafana \ -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
+9) Get to http://<your_grafana_ui_IP>:3000 and log in with `admin` and `password`
