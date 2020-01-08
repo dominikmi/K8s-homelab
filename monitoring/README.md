@@ -1,4 +1,4 @@
-!!!Prometheus & Grafana setup
+# Prometheus & Grafana setup
 
 1) Create manually Storage Class definition: `manual-storage-class.yaml`
 2) Create two PV: storage-volume & config-volume,
