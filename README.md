@@ -1,6 +1,6 @@
 # K8s-stuff
-This is a repository of all my test deployments on my home K8s. It contains various homebrewed yaml and builds.
-Nothing fancy, so far.
+This is a repository of all my test deployments on my home K8s. It contains various homebrewed or modified vendor yaml files.
+Nothing fancy, so far. Basic stuff.
 
 - adding-roles-to-users (exercise to define certain RBAC for given users)
 - app-deployments (test apps deployments accessible via ingress nginx)
