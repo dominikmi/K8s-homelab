@@ -1,11 +1,9 @@
 # Install and configure a K8s lab.
 
-System: Fedora 31, 16GB RAM, 450GB SSD.
+OS: Fedora 31, 16GB RAM, 450GB SSD.
 virtualization: KVM, libvirt
-=======================================
 
-Note: This short tutorial will likely get you a nicely running home/lab K8s environment. However, any production deployment will require a bit more work. For production efforts please refer directly to the Kubernetes documentation.
-=======================================
+**Note:** This short tutorial will likely get you a nicely running home/lab K8s environment. However, any production deployment will require a bit more work. For production efforts please refer directly to the Kubernetes documentation.
 
 ### 1. Install and configure KVM, libvirtd
 There's not much to do as the Fedora 31 comes along pretty well with KVM already configured and preinstalled with the system. Basically ready to go. If you don't like your default disc layout Fedora installer made for you during the installation process, you can move the /var/lib/libvirt/images folder to /home and created a symlink in place of the original images store.
