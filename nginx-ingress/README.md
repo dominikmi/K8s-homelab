@@ -1,86 +1,62 @@
-Trzecie podejście do deploymentu nginx jako lokalnego LoadBalancera dla prywatnego klastra K8s on-premise.
-----------------------------------------------------------------------------------------------------------
 
-(Żadnego chmurowego LB nie ma.)
------------------------------
+# Setting up nginx as ingress on K8s on-prem deployment.
 
-Klaster: kmaster + 2 workery:
+## Cluster: master + 2 workers:
 
-kmaster:  192.168.122.100
-kworker1: 192.168.122.101
-kworker2: 192.168.122.102
+- kmaster:  192.168.122.100
+- kworker1: 192.168.122.101
+- kworker2: 192.168.122.102
 
-sieć usługowa K8s: 10.32.0.0/12
-----------------------------
+## Task
 
-Zadanie:
--------
-Aplikacja z dwoma replikami na worker1 i worker2, port 80 udostępniony przez zdefiniowany service.
-Dostęp do aplikacji z zewnątrz (z hosta w sieci lokalnej poprzez virbr0: 192.168.122.1)
+We would like to test an app deployment, where the app will has 2 replicas accessible via port 80 defined in the app service. The nginx deployment will be our load balancer object with default back-end. All ingress traffic coming to our apps as app.dominik.com/app1 or ../app2 will be routed to the respective deployed app.
 
-Jako load balancer wykorzystamy nginx z defaultowym back-endem. Wszystko z zewnątrz co przychodzi na app.<nazwa>.com/app1 i app.<nazwa>.com/app2  ma być przekierowane na aplikację w klastrze.
+- Applications namespace: aplikacja
+- Nginx and ingress namespace: ingress
 
-- Namespace dla aplikacji: aplikacja
-- Namespace dla nginx i obiektu ingress: ingress
+The app deployment is described [here](https:///github.com/dominikmi/K8s-stuff/tree/master/app-deployment/README.md)
 
-1. Najpierw tworzymy przykładowe dwie aplikacje z dwiema replikami każda (hello-app i zwykly Apache) z dockersamples/static-site i ..httpd.
+1. Create ingress namespace: `kubectl create namespace ingress`
+2. Create default backend for nginx - service (to expose the nginx to the net) and deployment definitions:
 
--> plik: app-deployment.yaml
+- file: **default-backend-deploy.yaml**
+- file: **default-backend-svc.yaml**
 
+3. Let's deploy both (mark the namespace defined in both):
+- `kubectl apply -f default-backend-svc.yaml` and `kubectl apply -f default-backend-deploy.yaml`
+- check it out: `kubectl get all --namespace=ingress -o wide`
 
-2. Teraz tworzymy dwa serwisy dla każdej z aplikacji, które będę wystawiały aplikację na świat z adresem danego poda na porcie 80:
+4. Create config map for the ingress controller: 
+- file: **nginx-ingress-controller-conf.yaml**
 
--> plik: app-service.yaml
+5. The Nginx controller deployment:
+- image source from [quay](https://quay.io/repository/kubernetes-ingress-controller/nginx-ingress-controller)
+- read the [release notes](https://github.com/kubernetes/ingress-nginx/releases)
+- if you like, you can pull the docker image manually: `docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.26.1`
 
-3. Ustawiamy bieżący kontekst na namespace: aplikacja: kubectl config set-context --current --namespace=aplikacja 
-4. Tworzymy teraz deployment aplikacji i serwisy: kubectl apply -f app-deployment.yaml -f app-service.yaml
-5. Sprawdzamy w przestrzeni: aplikacja - czy jest Ok: kubectl get all -o wide -n aplikacja
-6. Tworzenie namespace ingress - kubectl create namespace ingress.
-7. Tworzymy teraz defaultowy backend dla nginx, analogicznie troche jak wyzej - czyli deployment i ekspozycja w sieci przez service:
+6. Before we come to our nginx controller deployment, we need to set up two roles for the nginx service account: 
+- ClusterRole: **nginx-ingress-clusterrole** (cluster wide definition)
+- Role in the ingress namespace: **nginx-ingress-role**
+- both in the file: **nginx-ingress-controll-roles.yaml**
+- deploy both roles: `kubectl apply -f nginx-ingress-controll-roles.yaml`
 
--> plik: default-backend-deploy.yaml
--> plik: default-backend-svc.yaml
+7. The deployment is defined in the **nginx-ingress-controll-deploy.yaml** with reference to the previously deployed roles.
+- `kubectl apply -f nginx-ingress-controll-deploy.yaml`
 
-8. Tworzymy: kubectl apply -f default-..jeden i drugi  Działa? kubectl get all --namespace=ingress -o wide
-9. Tworzymy ConfigMap dla nginx jako ingress-controllera (kontrolera ruchu wchodzącego do klastra) - mozna albo przez Annotations, albo ConfigMap, albo przez skastomizowane template-y w podmontowanym Volume (PV i PVC):
+8. The nginx controller service will define all L7 upstream routing to our apps:
+- file: **nginx-ingress-controll-svc.yaml**
+- ingress objects for our nginx and the apps:
+	- file: **ingress-nginx.yaml**
+	- file: **ingress-aplikacje.yaml**
+- deploy all of the above with the `kubectl apply -f <file>` command.
 
--> plik: nginx-ingress-controller-conf.yaml
+### for those who do not have local DNS configured:
 
-10. Tworzymy deployment samego nginxa - kontrolera ruchu przychodzącego/wchodzącego do klastra:
- - image pobierzemy sobie z quaya: https://quay.io/repository/kubernetes-ingress-controller/nginx-ingress-controller (quay'a polecam - bo ma security skaner i mozna od razu podejrzeć jakiego "dziurawca" ściągamy) 
- - poczytajmy: https://github.com/kubernetes/ingress-nginx/releases
- - i na wszelki wypadek możemy ściągnąć ręcznie: docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.26.1
+- LoadBalancer IP: <IP> 
+- on the kvm host in `/etc/hosts` put the following entry:
+	- ```<IP>	app.<nazwa>.com```
 
-11. Zanim utworzymy deployment, utworzmy role  dla samego konta usługowego (serviceaccount) nginx-a: Klastrowa - definiowana prez ClusterRole i nazwana: nginx-ingress-clusterrole, i 	w ramach przestrzeni nazw: ingres - nazwana: nginx-ingress-role
-
--> plik: nginx-ingress-controll-roles.yaml
-
-12. Teraz dopiero możemy utworzyć deployment samego nginx-a, który dostanie odpowiednie uprawnienia via RBAC K8sowy:
-
--> plik: nginx-ingress-controll-deploy.yaml
-
-13. A teraz czas na serwis nginx'a i reguły rutujące ruch L7 w odpowiednie miejsca:
-
--> plik: nginx-ingress-controll-svc.yaml
-
-14. Obiekt ingress dla nginx-a i dla aplikacji :
-
--> plik: ingress-nginx.yaml
--> plik: ingress-aplikacje.yaml
-
-WAŻNE - dla tych, którzy nie mają lokalnego DNSa pod ręką:
-
-IP LoadBalancera: <IP> 
-Na hoście kvm-emowym, w /etc/hosts wstawiamy:
-<IP>	app.<nazwa>.com
-
-i teraz curl http://app.<nazwa>.com/app1 i ../app2
-
-pierwszy curl powinien pokazać NGINXa a drugi Apache'a,
-
-Do pomocy w rozwiązywaniu problemów natrafiłem na taki shell-script który listuje wszystkie resourcy i sub-resourcy w grupach API:
-$ _list=($(kubectl get --raw / |grep "^    \"/api"|sed 's/[",]//g')); for _api in ${_list[@]}; do _aruyo=$(kubectl get --raw ${_api} | jq .resources); if [ "x${_aruyo}" != "xnull" ]; then echo; echo "===${_api}==="; kubectl get --raw ${_api} | jq -r ".resources[].name"; fi; done
-
-I już mamy podstawę do twórczego rozwijania własnego K8s. :)
-
+9. Test the deployment from the host:
+- `curl http://app.<name>.com/app1` and `curl http://app.<name>.com/app1` 
+- first should return NGINX default page, the second the Apache's one.
 
