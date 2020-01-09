@@ -1,8 +1,13 @@
 # Prometheus & Grafana setup
 
 1) Create manually Storage Class definition: `manual-storage-class.yaml`
-2) Create two PV: storage-volume & config-volume,
+2) Create two PV: storage-volume & config-volume in Longhorn -> create Volumes, name them, create PV (not PVC!) and do not attach them. Prometheus will take care of it.
 3) Install Prometheus `helm install prometheus stable/prometheus --set server.storageClass=manual`
+
+After a moment (in around 90 seconds) you should see in your longhorn panel something like this:
+
+![longhorn PVs](files/pic-m1.png)
+
 4) In `monitoring` forlder mkdir `grafana`
 6) cd `grafana` and create two files:
 	- grafana-configmap.yaml
