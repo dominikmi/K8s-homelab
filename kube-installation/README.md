@@ -68,7 +68,7 @@ As of now, I'd go with 1.16.4.
 
 - `$ sudo apt-get install -y kubelet=<version> kubeadm=<version> kubectl=<version>` 
 
-Set cgroupfs for docker to systemd (per [this discussion](https://github.com/kubernetes/kubeadm/issues/1394)
+Set cgroupfs for docker to systemd (per [this discussion](https://github.com/kubernetes/kubeadm/issues/1394))
 ```
 # cat > /etc/docker/daemon.json <<EOF
 {
