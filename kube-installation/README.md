@@ -68,8 +68,19 @@ As of now, I'd go with 1.16.4.
 
 - `$ sudo apt-get install -y kubelet=<version> kubeadm=<version> kubectl=<version>` 
 
-vi **/etc/systemd/system/kubelet.service.d/10-kubeadm.conf**
-add line at the end of the "Environment.." list: `Environment=”cgroup-driver=systemd/cgroup-driver=cgroupfs”`
+Set cgroupfs for docker to systemd (per [this discussion](https://github.com/kubernetes/kubeadm/issues/1394)
+```
+# cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+```
 
 Using "Virtual Machine Manager" clone the preconfigured master instance to as many worker instances as you can handle (2-3, with 1CPU and 1.5GB RAM).
 On each instance change the hostname in */etc/hostname* and */etc/hosts* and replace the master instance's IP with appropriate one in */etc/network/interfaces*
