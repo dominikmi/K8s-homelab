@@ -6,7 +6,7 @@ virtualization: KVM, libvirt
 **Note:** This short tutorial will likely get you a nicely running home/lab K8s environment. However, any production deployment will require a bit more work. For production efforts please refer directly to the Kubernetes documentation.
 
 ### 1. Install and configure KVM, libvirtd
-There's not much to do as the Fedora 31 comes along pretty well with KVM already configured and preinstalled with the system. Basically ready to go. If you don't like your default disc layout Fedora installer made for you during the installation process, you can move the /var/lib/libvirt/images folder to /home and created a symlink in place of the original images store.
+There's not much to do as the Fedora 31 comes along pretty well with KVM already configured and preinstalled with the system. Basically ready to go. If you don't like your default disc layout Fedora installer made for you during the installation process, you can move the /var/lib/libvirt/images folder to /home and created a symlink in place of the original images store. Please use the "Virtual Machine Manager" installed by default on Fedora 31 to create the VMs - 1 CPU, 3GB RAM for master, 1 CPU 1,5GB RAM for workers is enough for the beginning. 
 
 ### 2. Activate sshd on the system.
 ```
@@ -61,7 +61,12 @@ Update your KVM host /etc/hosts i.e.
 - `$ sudo touch /etc/apt/sources.list.d/kubernetes.list `
 - `$ echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list`
 - `$ sudo apt-get update`
-- `$ sudo apt-get install -y kubelet kubeadm kubectl` 
+
+And here, you can first run this command to pick the version you like (don't try the latest one, I mean it): 
+`curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'`
+As of now, I'd go with 1.16.4.
+
+- `$ sudo apt-get install -y kubelet=<version> kubeadm=<version> kubectl=<version>` 
 
 vi **/etc/systemd/system/kubelet.service.d/10-kubeadm.conf**
 add line at the end of the "Environment.." list: `Environment=”cgroup-driver=systemd/cgroup-driver=cgroupfs”`
