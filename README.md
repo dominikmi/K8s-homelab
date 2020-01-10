@@ -1,5 +1,5 @@
 # K8s-stuff
-This is a repository of all my test deployments on my home K8s. It contains various homebrewed or modified vendor yaml files.
+I needed a local, totally cloud independent (that sounds abhorrent!) environment that I can try, break, destroy, fix, start all over again, leave it for a night or a week, without paying attention how much *$$$* i already owe a cloud provider. This is a repository of all my test deployments I have done in my home Kubes lab. It contains various homebrewed or modified vendor yaml files.
 Nothing fancy so far.  Basic stuff.
 
 - [setting up a Kubernetes lab on Fedora31](kube-installation/README.md)
