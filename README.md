@@ -15,6 +15,7 @@ Nothing fancy so far.  Basic stuff.
 
 - tutorial on setting up helm v3 along with a Github repo,
 - working with Kube DNS,
+- setting up all web services access through nginx ingress,
 - setting up nginx ingress controller by a helm chart,
 - application deployment using helm charts,
 - test istio deployments,
