@@ -190,3 +190,14 @@ kworker1   Ready    <none>   7m28s   v1.16.4   192.168.122.101   <none>        U
 kworker2   Ready    <none>   7m10s   v1.16.4   192.168.122.102   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
 kworker3   Ready    <none>   6m59s   v1.16.4   192.168.122.103   <none>        Ubuntu 16.04.6 LTS   4.4.0-171-generic   docker://18.9.7
 ```
+
+## Next steps
+The next steps can be accomplished straight by kubes yaml files or helm3 charts. 
+
+- [Install Longhorn to provide storage persistency](../longhorn/README.md)
+- [Install kubes monitoring - Prometheus & Grafana](../monitoring/README.md)
+- [Install resource usage metrics (metrics server)](../metrics-server/README.md)
+- [Define roles and add unix users to Kubes](../adding-roles-to-users/README.md)
+- [Nginx ingress controller deployment](../nginx-ingress/README.md)
+- (WIP) Install Helm 3 & helm repo on Github
+
