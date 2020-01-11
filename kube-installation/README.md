@@ -165,7 +165,7 @@ $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-Also, you may copy the *$HOME/.kube* to your home directory on the host system. Once you install the *kubectl* package on your host, you will be able to do all your work with the kubes remotely.
+Also, you may copy the *$HOME/.kube* to your home directory on the host system. Once you install the *kubectl* package on your host (i.e. using snap service on Fedora), you will be able to do all your work with the kubes remotely.
 
 Install CNI network pod on kmaster to the whole cluster:
  `$ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"`
