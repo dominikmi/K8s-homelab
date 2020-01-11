@@ -17,7 +17,7 @@ $ sudo systemctl start sshd
 ### 3. Check libvirtd:
 
 - `$ sudo lsmod |grep kvm`
-- `$ sduo systemctl status libvirtd`
+- `$ sudo systemctl status libvirtd`
 - `$ sudo systemctl enable libvirtd`
 - `$ sudo systemctl daemon-reload`
 - `$ sudo systemctl start libvirtd`
@@ -67,6 +67,8 @@ And here, you can first run this command to pick the version you like (don't try
 As of now, I'd go with 1.16.4.
 
 - `$ sudo apt-get install -y kubelet=<version> kubeadm=<version> kubectl=<version>` 
+
+Then I'd hold up with upgrading the trio by apt-get with the following command: `sudo apt-mark hold kubelet kubeadm kubectl`.
 
 Set cgroupfs for docker to systemd (per [this discussion](https://github.com/kubernetes/kubeadm/issues/1394))
 ```
