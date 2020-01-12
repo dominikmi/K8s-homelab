@@ -60,3 +60,5 @@ The app deployment is described [here](https:///github.com/dominikmi/K8s-stuff/t
 - `curl http://app.<name>.com/app1` and `curl http://app.<name>.com/app1` 
 - first should return NGINX default page, the second the Apache's one.
 
+------------
+There is a shorter way to achieve the above, just go [there](kubernetes/README.md) and run two `kubectl ..` commands.
