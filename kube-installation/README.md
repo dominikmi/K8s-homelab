@@ -27,7 +27,22 @@ $ sudo systemctl start sshd
 
 http://releases.ubuntu.com/16.04/ - to me, Ubuntu 16.04 LTS has proven most seamless K8s deployment.
 
-### 5. Configure the network in */etc/network/interfaces* with the following:
+Also, for the purpose of having a local DNS on the host as well as having default  DHCP on for no purpose (in our case), we totally wipe out the DNS and DHCP from our libvirt default network definition.
+It should look as simple as this (it then disables automatically libvirt's dnsmasq dhcp and dns services on the host):
+```
+network>
+  <name>default</name>
+  <uuid>35d836f8-4b98-4392-963b-xxxxxxxxxxxxx</uuid>
+  <forward mode='nat'/>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <mac address='xx:xx:xx:xx:xx:xx'/>
+  <dns enable='no'/>
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+  </ip>
+</network>
+```
+
+### 5. Configure each vm's network in */etc/network/interfaces* with the following:
 ```
 # The primary network interface
 auto ens3
@@ -39,19 +54,20 @@ iface ens3 inet static
 	gateway 192.168.122.1
 	# dns-* options are implemented by the resolvconf package, if installed
 	dns-nameservers 192.168.122.1
-	dns-search home
+	dns-search homelab.local
 ```
 
 Update your KVM host /etc/hosts i.e.
 ```
-192.168.122.100	kmaster.home	kmaster
-192.168.122.101	kworker1.home	kworker1
-192.168.122.102	kworker2.home	kworker2
-192.168.122.103	kworker3.home	kworker3
-192.168.122.1	kdns.home	kdns
+192.168.122.100	kmaster.homelab.local	kmaster
+192.168.122.101	kworker1.homelab.local	kworker1
+192.168.122.102	kworker2.homelab.local	kworker2
+192.168.122.103	kworker3.homelab.local	kworker3
+192.168.122.1	kdns.homelab.local	kdns
 ```
+(**NOTE**: Local DNS setup on the host (kdns) is described at the bottom of this document)
 
-### 6. Install prerequisites of the K8s on master and worker1-2
+### 6. Install prerequisites of the K8s on master and worker1-3
 
 - `$ sudo swapoff -a`
 - `$ sudo vi /etc/fstab` and hash out the swap line
@@ -83,6 +99,8 @@ Set cgroupfs for docker to systemd (per [this discussion](https://github.com/kub
 }
 EOF
 ```
+
+Add yourself to the docker group: `sudo usermod -aG docker $USER`
 
 Using "Virtual Machine Manager" clone the preconfigured master instance to as many worker instances as you can handle (2-3, with 1CPU and 1.5GB RAM).
 On each instance change the hostname in */etc/hostname* and */etc/hosts* and replace the master instance's IP with appropriate one in */etc/network/interfaces*
@@ -204,4 +222,47 @@ The next steps can be accomplished straight by kubes yaml files or helm3 charts.
 - [Define roles and add unix users to Kubes](../adding-roles-to-users/README.md)
 - [Nginx ingress controller deployment](../nginx-ingress/README.md)
 - (WIP) Install Helm 3 & helm repo on Github
+
+------------------
+## Local DNS setup
+
+We need a local DNS to provide full domain name resolution for our local *homelab.local* domain. Also, it will provide us a loadbalancing feature (round-robin, cyclic) for our Kubernetes Web services. For example - the nginx ingress deployed as a DaemonSet will be installed on all cluster nodes and will bind the 80 and 443 ports on them. Then based on a request like http[s]://<name>.homelab.local it routes the request upstream to the previously configured app.
+ 
+The `dnsmasq` on the host (neither the one featured by our libvirt based hypervisor, nor the extra installed one) does not support wildcard domain with multiple IP required to get the DNS based loadbalancer set. For that purpose we need to install `bind9`. You basically need to follow this [FedoraMagazine article](https://fedoramagazine.org/how-to-setup-a-dns-server-with-bind/) with few more "enhancements":
+
+1. In the `/etc/named.conf` add the following line: `rrset-order { type A name "*.homelab.local" order cyclic; };`,
+2. The forward zone definition should start with: `zone "homelab.local" IN {` (yes, without the hostname appended at the beginning),
+3. To get the cyclic round-robin going the following entries shall be put into the *forward.homelab.local* file:
+```
+$TTL 86400
+@   IN  SOA     kdns.homelab.local. admin.homelab.local. (
+        2020011301  ;Serial
+        3600        ;Refresh
+        1800        ;Retry
+        604800      ;Expire
+        86400       ;Minimum TTL
+)
+@       IN  NS          kdns.homelab.local.
+@       IN  A           192.168.122.1
+kdns            IN  A   192.168.122.1
+kmaster         IN  A   192.168.122.100
+kworker1        IN  A   192.168.122.101
+kworker2        IN  A   192.168.122.102
+kworker3        IN  A   192.168.122.103
+*		IN  A	192.168.122.100
+*		IN  A	192.168.122.101
+*		IN  A	192.168.122.102
+*		IN  A	192.168.122.103
+```
+
+Finally, you should be able to test that by `host <put_any_name>.homelab.local` with the following result:
+```
+$ host anyname.homelab.local
+anyname.homelab.local has address 192.168.122.101
+anyname.homelab.local has address 192.168.122.102
+anyname.homelab.local has address 192.168.122.103
+anyname.homelab.local has address 192.168.122.100
+```
+
+It's a cyclical r-r, so the last entry with .100 will come one line up next time you repeat the command. And so on.
 
