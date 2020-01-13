@@ -226,6 +226,8 @@ The next steps can be accomplished straight by kubes yaml files or helm3 charts.
 ------------------
 ## Local DNS setup
 
+**NOTE:**First, the below presented setup is for local, lab/test purpose only. Do not try it yourself at work or any production without prior detailed discussion with your network admin and security folks.
+
 We need a local DNS to provide full domain name resolution for our local *homelab.local* domain. Also, it will provide us a loadbalancing feature (round-robin, cyclic) for our Kubernetes Web services. For example - the nginx ingress deployed as a DaemonSet will be installed on all cluster nodes and will bind the 80 and 443 ports on them. Then based on a request like http[s]://<name>.homelab.local it routes the request upstream to the previously configured app.
  
 The `dnsmasq` on the host (neither the one featured by our libvirt based hypervisor, nor the extra installed one) does not support wildcard domain with multiple IP required to get the DNS based loadbalancer set. For that purpose we need to install `bind9`. You basically need to follow this [FedoraMagazine article](https://fedoramagazine.org/how-to-setup-a-dns-server-with-bind/) with few more "enhancements":
