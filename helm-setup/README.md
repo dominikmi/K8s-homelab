@@ -2,7 +2,7 @@
 
 1. To get Helm 3 installed, simply follow the [tutorial](https://helm.sh/docs/intro/install/) how to install and how to [use](https://helm.sh/docs/intro/using_helm/) helm.
 2. Once you get helm set in your host, it will start using your credentials `~/.kube/config` to communicate with Kubes APIs.
-3. Somewhere in your work folder create a `<local-helm-charts-folder>`, go there and start searching charts for stuff you like with `helm search hub <name>.
+3. Somewhere in your work folder create a `<local-helm-charts-folder>`, go there and start searching charts for stuff you like with `helm search hub <name>`.
 4. You basically add a repo like you'd do with a repo for your linux packages: `helm repo add <local-repo-name> <repo URL>` (optionally you can also pass there login and password to the repo, if it's private one)
 	```
 	$ helm repo list
